@@ -27,9 +27,13 @@ class _HomeState extends State<Home> {
   final dolarController = TextEditingController();
   final euroController = TextEditingController();
   final realController = TextEditingController();
+  final pesoController = TextEditingController();
+  final canadianDolarController = TextEditingController();
 
   double dolar = 0;
   double euro = 0;
+  double peso = 0;
+  double canadianDolar = 0;
 
   void _realChange(String text) {
     if (text.isEmpty) {
@@ -39,6 +43,8 @@ class _HomeState extends State<Home> {
     double real = double.parse(text);
     dolarController.text = (real / dolar).toStringAsFixed(2);
     euroController.text = (real / euro).toStringAsFixed(2);
+    pesoController.text = (real / peso).toStringAsFixed(2);
+    canadianDolarController.text = (real / canadianDolar).toStringAsFixed(2);
   }
 
   void _dolarChange(String text) {
@@ -49,6 +55,8 @@ class _HomeState extends State<Home> {
     double dolar = double.parse(text);
     realController.text = (dolar * this.dolar).toStringAsFixed(2);
     euroController.text = (dolar * this.dolar / euro).toStringAsFixed(2);
+    pesoController.text = (dolar * this.dolar / peso).toStringAsFixed(2);
+    canadianDolarController.text = (dolar * this.dolar / canadianDolar).toStringAsFixed(2);
   }
 
   void _euroChange(String text) {
@@ -59,12 +67,43 @@ class _HomeState extends State<Home> {
     double euro = double.parse(text);
     realController.text = (euro * this.euro).toStringAsFixed(2);
     dolarController.text = (euro * this.euro / dolar).toStringAsFixed(2);
+    pesoController.text = (euro * this.euro / peso).toStringAsFixed(2);
+    canadianDolarController.text = (euro * this.euro / canadianDolar).toStringAsFixed(2);
+
+  }
+
+  void _pesoChange(String text) {
+    if (text.isEmpty) {
+      _clearAll();
+      return;
+    }
+    double peso = double.parse(text);
+    realController.text = (peso * this.peso).toStringAsFixed(2);
+    dolarController.text = (peso * this.peso / dolar).toStringAsFixed(2);
+    euroController.text = (peso * this.peso / euro).toStringAsFixed(2);
+    canadianDolarController.text = (peso * this.peso / canadianDolar).toStringAsFixed(2);
+
+  }
+
+  void _canadianDolarChange(String text) {
+    if (text.isEmpty) {
+      _clearAll();
+      return;
+    }
+    double canadianDolar = double.parse(text);
+    realController.text = (canadianDolar * this.canadianDolar).toStringAsFixed(2);
+    dolarController.text = (canadianDolar * this.canadianDolar / dolar).toStringAsFixed(2);
+    euroController.text = (canadianDolar * this.canadianDolar / euro).toStringAsFixed(2);
+    pesoController.text = (canadianDolar * this.canadianDolar / peso).toStringAsFixed(2);
+
   }
 
   void _clearAll() {
     realController.clear();
     dolarController.clear();
     euroController.clear();
+    canadianDolarController.clear();
+    pesoController.clear();
   }
 
   @override
@@ -74,7 +113,7 @@ class _HomeState extends State<Home> {
         appBar: AppBar(
             title: const Text("\$ Conversor de Moedas \$"),
             centerTitle: true,
-            backgroundColor: Colors.amber),
+            backgroundColor: Colors.blueGrey),
         body: FutureBuilder<Map>(
             future: getData(),
             builder: (context, snapshot) {
@@ -101,14 +140,17 @@ class _HomeState extends State<Home> {
                         snapshot.data!["results"]["currencies"]["USD"]["buy"];
                     euro =
                         snapshot.data!["results"]["currencies"]["EUR"]["buy"];
-
+                    peso = 
+                        snapshot.data!["results"]["currencies"]["ARS"]["buy"];
+                    canadianDolar = 
+                        snapshot.data!["results"]["currencies"]["CAD"]["buy"];
                     return SingleChildScrollView(
                       padding: const EdgeInsets.all(10.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: <Widget>[
                           const Icon(Icons.monetization_on,
-                              size: 150.0, color: Colors.amber),
+                              size: 150.0, color: Colors.blue),
                           buildTextFormField(
                               "Reais", "R\$", realController, _realChange),
                           const Divider(),
@@ -116,7 +158,13 @@ class _HomeState extends State<Home> {
                               "Dólar", "US\$", dolarController, _dolarChange),
                           const Divider(),
                           buildTextFormField(
+                              "Dólar Canadense", "CAD", canadianDolarController, _canadianDolarChange),
+                          const Divider(),
+                          buildTextFormField(
                               "Euro", "EUR", euroController, _euroChange),
+                          const Divider(),
+                          buildTextFormField(
+                              "Peso Argentino", "ARS", pesoController, _pesoChange),
                         ],
                       ),
                     );
@@ -132,10 +180,11 @@ class _HomeState extends State<Home> {
       controller: controller,
       decoration: InputDecoration(
           labelText: label,
-          labelStyle: const TextStyle(color: Colors.amber),
+          labelStyle: const TextStyle(color: Colors.blueAccent),
           border: const OutlineInputBorder(),
-          prefixText: "$prefix "),
-      style: const TextStyle(color: Colors.amber, fontSize: 25.0),
+          prefixText: "$prefix ",
+          prefixStyle: const TextStyle(color: Colors.blueGrey),),
+      style: const TextStyle(color: Colors.blueAccent, fontSize: 25.0),
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
     );
   }
